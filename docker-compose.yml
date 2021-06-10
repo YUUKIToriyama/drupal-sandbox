@@ -1,0 +1,58 @@
+version: '3.7'
+services:
+  drupal:
+    image: drupal:9.0-apache
+    networks:
+      drupal_net:
+    volumes:
+    - drupal-modules:/var/www/html/modules
+    - drupal-profiles:/var/www/html/profiles
+    - drupal-themes:/var/www/html/themes
+    - drupal-sites:/var/www/html/sites
+    ports:
+    - 8080:80
+    depends_on:
+    - db
+    restart: always
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    networks:
+      drupal_net:
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+    - 5433:5432
+    restart: always
+networks:
+  drupal_net:
+    driver: bridge
+volumes:
+  drupal-modules:
+    driver_opts:
+      type: none
+      device: $PWD/data/html/modules
+      o: bind
+  drupal-profiles:
+    driver_opts:
+      type: none
+      device: $PWD/data/html/profiles
+      o: bind
+  drupal-themes:
+    driver_opts:
+      type: none
+      device: $PWD/data/html/themes
+      o: bind
+  drupal-sites:
+    driver_opts:
+      type: none
+      device: $PWD/data/html/sites
+      o: bind
+  postgres-data:
+    driver_opts:
+      type: none
+      device: $PWD/data/postgres
+      o: bind
